@@ -1,88 +1,255 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0B4843"><title>ZT日報DX 2.0</title><meta name="referrer" content="no-referrer">
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#101918"><title>ZT日報DX 3.0</title><meta name="referrer" content="no-referrer">
 <style>
-:root{--ink:#172B32;--sub:#3f545c;--bg:#F5F7F6;--card:#fff;--line:#cfd8d6;--brand:#0B4843;--brand2:#12756d;--accent:#D9A03A;--soft:#e7f0ee;--err:#b42318;
-font-family:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);line-height:1.6;font-size:17px}
-header{background:var(--brand);color:#fff;padding:18px 16px 16px}
-header>*{max-width:780px;margin-left:auto;margin-right:auto}
-h1{font-size:21px;margin:0 auto 2px;letter-spacing:.04em;font-weight:800;display:flex;align-items:center;gap:10px}
-h1:before{content:"";width:8px;height:22px;border-radius:3px;background:var(--accent)}
-h1 small{font-size:12px;font-weight:700;background:rgba(255,255,255,.2);padding:2px 8px;border-radius:999px}
-#company{font-size:14px;opacity:.9}
-main{max-width:780px;margin:0 auto;padding:12px 16px 150px}
-h2{font-size:19px;margin:0 0 4px;font-weight:800}
-section{background:var(--card);border-radius:16px;padding:18px 16px;margin-bottom:16px;border:1px solid #e1e7e5;box-shadow:0 2px 10px rgba(23,43,50,.05)}
+:root{--black:#101918;--green:#103D38;--gold:#C6A66B;--gold-d:#9C8048;--white:#FFFFFF;--ink:#101918;--sub:#4A5553;--bg:#F3F3F0;--line:#D6D9D5;--soft:#EEF2EF;--err:#B42318;
+font-family:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+*{box-sizing:border-box}[hidden]{display:none!important}html,body{margin:0;background:var(--bg)}body{line-height:1.6;font-size:17px}
+button,input,select{font:inherit}
+/* header */
+header{background:var(--black);color:var(--white);padding:calc(14px + env(safe-area-inset-top)) 20px 14px}
+header>div{max-width:720px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-size:13px;font-weight:700;letter-spacing:.28em;color:var(--gold)}
+#company{font-size:14px;opacity:.85;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+main{max-width:720px;margin:0 auto;padding:16px 16px 120px}
+#message{white-space:pre-wrap;padding:12px 14px;margin-bottom:14px;border-radius:12px;background:var(--white);font-size:15px;border:1px solid var(--line)}
+#message:empty{display:none}#message.error{color:var(--err);background:#FFF4F2;border-color:#F3C7C0;font-weight:700}
+/* views */
+.view{display:none}
+#app[data-view=home] #v-home,#app[data-view=report] #v-report,#app[data-view=gacha] #v-gacha,#app[data-view=card] #v-card,#app[data-view=mypage] #v-mypage,#app[data-view=admin] #v-admin{display:block}
+h2{font-size:19px;margin:0 0 6px;font-weight:800;letter-spacing:.02em}
+h3{font-size:15px;margin:0 0 8px;color:var(--sub);font-weight:700;letter-spacing:.06em}
+section{background:var(--white);border-radius:18px;padding:20px 18px;margin-bottom:16px;border:1px solid #E4E6E2}
+.note{color:var(--sub);font-size:15px;margin:8px 0}
+.muted{color:var(--sub)}
+/* member card */
+.mcard{position:relative;aspect-ratio:1.586;width:100%;border-radius:20px;padding:22px 22px 20px;color:var(--white);background:linear-gradient(150deg,#16231F 0%,var(--black) 45%,var(--green) 100%);display:flex;flex-direction:column;justify-content:space-between;margin-bottom:16px;overflow:hidden;box-shadow:0 10px 30px rgba(16,25,24,.25)}
+.mcard:after{content:"";position:absolute;inset:0;border-radius:20px;border:1px solid rgba(198,166,107,.35);pointer-events:none}
+.mcard .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.mcard .lbl{font-size:12px;font-weight:700;letter-spacing:.3em;color:var(--gold)}
+.rank{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.18em;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:3px 12px}
+.mcard .name{font-size:clamp(20px,6vw,28px);font-weight:800;line-height:1.3;letter-spacing:.02em;word-break:break-all}
+.mcard .bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+.mcard .k{font-size:11px;letter-spacing:.14em;color:rgba(255,255,255,.6)}
+.mcard .v{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.06em}
+.mcard .pts{text-align:right}.mcard .pts .v{font-size:clamp(22px,7vw,30px);color:var(--white)}
+.mcard .pts small{font-size:13px;color:var(--gold);margin-left:3px}
+/* home */
+.stat{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.stat>div{background:var(--white);border:1px solid #E4E6E2;border-radius:16px;padding:14px 16px}
+.stat b{display:block;font-size:22px;font-variant-numeric:tabular-nums}
+.stat span{font-size:13px;color:var(--sub);font-weight:700}
+.bar-track{height:6px;border-radius:6px;background:#E3E6E2;overflow:hidden;margin-top:8px}.bar-fill{height:100%;background:var(--gold)}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:62px;border:0;border-radius:14px;background:var(--black);color:var(--white);font-size:18px;font-weight:800;letter-spacing:.06em;cursor:pointer;margin:0 0 12px;padding:12px 16px;text-decoration:none}
+.btn.gold{background:var(--gold);color:var(--black)}
+.btn.ghost{background:var(--white);color:var(--ink);border:2px solid var(--line)}
+.btn:disabled{opacity:.45}.btn:active{transform:scale(.98)}
+.ticket{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ticket .st{font-size:17px;font-weight:800}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--gold);margin-right:8px}.dot.off{background:#C9CCC8}
+/* form (from 2.0) */
 label{display:block;margin:22px 0 8px;font-weight:800;font-size:16px;color:var(--ink)}
-input,select,button{font:inherit;font-size:18px;min-height:56px;padding:12px 14px;border-radius:12px;border:2px solid var(--line);max-width:100%;background:#fff;color:var(--ink)}
+input,select{font-size:18px;min-height:58px;padding:12px 14px;border-radius:12px;border:2px solid var(--line);max-width:100%;background:var(--white);color:var(--ink)}
 input:not([type=checkbox]),select{width:100%}
-input[type=date],input[type=month]{-webkit-appearance:none;appearance:none;display:block;box-sizing:border-box;width:100%;max-width:100%;min-width:0;-webkit-min-logical-width:0;min-inline-size:0;inline-size:100%;height:56px;text-align:left;line-height:normal;font-size:17px}
+input[type=date],input[type=month]{-webkit-appearance:none;appearance:none;display:block;box-sizing:border-box;width:100%;max-width:100%;min-width:0;-webkit-min-logical-width:0;min-inline-size:0;inline-size:100%;height:58px;text-align:left;line-height:normal;font-size:17px}
 input::-webkit-date-and-time-value{text-align:left;margin:0;min-width:0}
-input::-webkit-date-and-time-value{text-align:left;margin:0}
 input::-webkit-calendar-picker-indicator{margin-left:auto}
-section,form,main{min-width:0;overflow-x:hidden}
-input:focus,select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 4px rgba(11,72,67,.18)}
-select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23172B32' stroke-width='2.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;padding-right:40px}
+section,form,main{min-width:0}
+input:focus,select:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 4px rgba(16,61,56,.18)}
+select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23101918' stroke-width='2.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;padding-right:40px}
 #start,#end{font-size:22px;font-weight:800;min-height:64px;text-align:center}
-button{cursor:pointer;background:var(--brand);color:#fff;border:0;font-weight:800}
-button:active{transform:scale(.98)}button:disabled{opacity:.45}
-button.secondary{background:#fff;color:var(--brand);border:2px solid var(--line);font-size:15px;min-height:44px;padding:8px 14px}
-nav{display:flex;gap:8px;justify-content:flex-end;margin:0 0 10px}
-nav button.secondary{border:0;background:transparent;text-decoration:underline;color:var(--sub);min-height:40px;padding:6px 8px}
-.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:#e3e9e7;padding:5px;border-radius:14px;margin-bottom:14px}
-.tabs button{min-height:52px;background:transparent;color:var(--sub);font-size:17px;border-radius:10px;margin:0}
-.tabs button.on{background:#fff;color:var(--brand);box-shadow:0 2px 6px rgba(23,43,50,.12)}
-#app[data-tab=input] #historySec,#app[data-tab=history] #entry{display:none}
-#app[data-tab=history] .bar{display:none}
+.small{white-space:nowrap;flex-shrink:0;background:var(--white);color:var(--green);border:2px solid var(--line);font-size:15px;font-weight:700;min-height:48px;padding:8px 18px;border-radius:999px;cursor:pointer}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:#E3E6E2;padding:5px;border-radius:14px;margin-bottom:14px}
+.tabs button{min-height:52px;background:transparent;color:var(--sub);font-size:17px;font-weight:800;border:0;border-radius:10px;cursor:pointer}
+.tabs button.on{background:var(--white);color:var(--ink);box-shadow:0 2px 6px rgba(16,25,24,.12)}
+#v-report[data-tab=input] #historySec,#v-report[data-tab=history] #entry{display:none}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .members{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.members label{position:relative;display:flex;align-items:center;justify-content:center;min-height:62px;margin:0;padding:10px 12px 10px 40px;background:#fff;border:2px solid var(--line);border-radius:14px;font-size:18px;font-weight:800;cursor:pointer;text-align:center;line-height:1.3}
+.members label{position:relative;display:flex;align-items:center;justify-content:center;min-height:62px;margin:0;padding:10px 12px 10px 42px;background:var(--white);border:2px solid var(--line);border-radius:14px;font-size:18px;font-weight:800;cursor:pointer;text-align:center;line-height:1.3}
 .members label input{position:absolute;opacity:0;pointer-events:none}
-.members label:before{content:"";position:absolute;left:12px;top:50%;width:22px;height:22px;margin-top:-11px;border:2px solid var(--line);border-radius:6px;background:#fff}
-.members label:has(input:checked){background:var(--brand);border-color:var(--brand);color:#fff}
-.members label:has(input:checked):before{content:"✓";border-color:#fff;background:#fff;color:var(--brand);font-size:17px;line-height:19px;text-align:center;font-weight:900}
+.members label:before{content:"";position:absolute;left:12px;top:50%;width:22px;height:22px;margin-top:-11px;border:2px solid var(--line);border-radius:6px;background:var(--white)}
+.members label:has(input:checked){background:var(--green);border-color:var(--green);color:var(--white)}
+.members label:has(input:checked):before{content:"✓";border-color:var(--white);background:var(--white);color:var(--green);font-size:17px;line-height:19px;text-align:center;font-weight:900}
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.seg button{min-height:60px;margin:0;background:#fff;color:var(--ink);border:2px solid var(--line);font-size:19px;border-radius:14px}
-.seg button.on{background:var(--brand);border-color:var(--brand);color:#fff}
-#shift{display:none}.grid:has(.seg){grid-template-columns:1fr;gap:0}
-.note{color:var(--sub);font-size:14px;margin:8px 0}
-.badge{color:var(--brand);font-weight:800}
-#totals{margin:14px 0 6px;padding:16px;border-radius:14px;background:var(--soft);font-size:22px;border-left:6px solid var(--accent)}
-.bar{position:fixed;left:0;right:0;bottom:0;z-index:10;background:rgba(255,255,255,.97);border-top:1px solid #dfe5e3;padding:10px 16px calc(12px + env(safe-area-inset-bottom));box-shadow:0 -4px 16px rgba(23,43,50,.08)}
-.bar>*{max-width:748px;margin-left:auto;margin-right:auto;display:block}
+.seg button{min-height:60px;background:var(--white);color:var(--ink);border:2px solid var(--line);font-size:19px;font-weight:800;border-radius:14px;cursor:pointer}
+.seg button.on{background:var(--green);border-color:var(--green);color:var(--white)}
+#shift{display:none}
+.badge{color:var(--green);font-weight:800}
+#totals{margin:14px 0 6px;padding:16px;border-radius:14px;background:var(--soft);font-size:21px;border-left:5px solid var(--gold)}
+.savebar{position:fixed;left:0;right:0;bottom:calc(68px + env(safe-area-inset-bottom));z-index:10;background:rgba(255,255,255,.97);border-top:1px solid #DDE0DC;padding:10px 16px 12px}
+.savebar>*{max-width:688px;margin-left:auto;margin-right:auto;display:block}
+#v-report[data-tab=history] .savebar{display:none}
+#v-report{padding-bottom:110px}
 #estimate{margin:0 auto 6px;text-align:center;font-size:16px}
-#save{width:100%;min-height:64px;font-size:19px;border-radius:14px;margin:0 auto}
-.reset{width:100%;margin-top:22px;background:transparent!important;border:0!important;color:var(--sub)!important;text-decoration:underline}
-.row{border:2px solid #e1e7e5;border-radius:14px;padding:14px 16px;margin-top:12px}
+#save{margin-bottom:0}
+.reset{display:block;margin:22px auto 0;background:transparent;border:0;color:var(--sub);text-decoration:underline;font-size:15px;min-height:44px;cursor:pointer}
+.row{border:2px solid #E4E6E2;border-radius:14px;padding:14px 16px;margin-top:12px}
 .row p{margin:0 0 4px}.row>p:first-child{font-weight:800;font-size:17px}
 .row .note{font-size:15px}
-.row button.secondary{margin:8px 0 2px;min-height:48px;padding:8px 22px;font-size:16px}
 .row details{margin-top:6px;font-size:14px;color:var(--sub)}
-#message{white-space:pre-wrap;padding:12px 14px;margin-bottom:10px;border-radius:12px;background:#fff;font-size:15px;border:1px solid #e1e7e5}
-#message:empty{display:none}#message.error{color:var(--err);background:#fff4f2;border-color:#f3c7c0;font-weight:700}
-pre{white-space:pre-wrap;word-break:break-word;background:#f0f3f2;padding:12px;border-radius:10px}
+pre{white-space:pre-wrap;word-break:break-word;background:#F0F2EF;padding:12px;border-radius:10px;font-size:13px}
 summary{cursor:pointer;min-height:40px;display:flex;align-items:center}
-#reasonBox{margin-top:6px;padding:2px 14px 14px;border-radius:12px;background:#fff6e6;border:2px solid #f0d9a8}
-#done{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background:rgba(11,72,67,.92);color:#fff;text-align:center;flex-direction:column;gap:10px;font-size:22px;font-weight:800}
-#done[hidden]{display:none}
-#done .ck{width:110px;height:110px;border-radius:50%;background:#fff;color:var(--brand);font-size:70px;line-height:110px}
-#done small{font-size:15px;font-weight:600;opacity:.9}
-@media(max-width:360px){.members{grid-template-columns:1fr}}
-</style></head><body>
-<header><h1>ZT日報DX <small>2.0</small></h1><div id="company">パートナー会社専用・代表者入力</div></header>
-<main><div id="message" role="status" aria-live="polite">LINE認証を確認しています…</div>
-<div id="app" hidden data-tab="input"><nav><button class="secondary" onclick="load()">再読込</button><button class="secondary" onclick="logout()">ログアウト</button></nav><div class="tabs"><button type="button" id="tabInput" class="on" onclick="tab('input')">日報入力</button><button type="button" id="tabHistory" onclick="tab('history')">履歴・集計</button></div>
+#reasonBox{margin-top:6px;padding:2px 14px 14px;border-radius:12px;background:#FBF6EC;border:2px solid #EADBB8}
+/* gacha */
+.gacha-hero{background:var(--black);color:var(--white);border-radius:20px;padding:26px 20px;text-align:center;margin-bottom:16px}
+.gacha-hero .lbl{font-size:12px;letter-spacing:.3em;color:var(--gold);font-weight:700}
+.gacha-hero .big{font-size:26px;font-weight:800;margin:8px 0 4px}
+.gacha-hero .note{color:rgba(255,255,255,.75)}
+.gacha-hero .btn{margin:16px 0 0}
+.dates{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+.dates button{min-height:44px;padding:6px 14px;border-radius:999px;border:1px solid rgba(198,166,107,.6);background:transparent;color:var(--white);font-weight:700;cursor:pointer}
+.dates button.on{background:var(--gold);color:var(--black);border-color:var(--gold)}
+table{width:100%;border-collapse:collapse;font-size:16px}
+td,th{padding:10px 4px;border-bottom:1px solid #ECEEEA;text-align:left}th{font-size:13px;color:var(--sub)}
+td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
+.rar{font-weight:800;letter-spacing:.06em}
+.hist{list-style:none;margin:0;padding:0}
+.hist li{display:flex;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid #ECEEEA;font-size:16px}
+.hist li b{font-variant-numeric:tabular-nums;color:var(--green)}
+dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:10px 16px;font-size:16px}
+dt{color:var(--sub);font-weight:700;white-space:nowrap}dd{margin:0;text-align:right;font-weight:700;word-break:break-all}
+/* bottom nav */
+nav.bottom{position:fixed;left:0;right:0;bottom:0;z-index:12;background:var(--black);padding:6px 6px calc(6px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(5,1fr)}
+nav.bottom button{min-height:56px;background:transparent;border:0;color:rgba(255,255,255,.55);font-size:12px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;position:relative}
+nav.bottom svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav.bottom button.on{color:var(--gold)}
+nav.bottom .pip{position:absolute;top:8px;right:calc(50% - 18px);width:9px;height:9px;border-radius:50%;background:var(--gold);border:2px solid var(--black)}
+nav.bottom .pip[hidden]{display:none}
+/* overlays */
+.ov{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:rgba(16,25,24,.985);color:var(--white);padding:24px;text-align:center}
+.ov[hidden]{display:none}
+.ov .box{width:100%;max-width:380px}
+.ov .ck{width:96px;height:96px;margin:0 auto 14px;border-radius:50%;border:2px solid var(--gold);color:var(--gold);font-size:52px;line-height:92px}
+.ov .t1{font-size:24px;font-weight:800}
+.ov .pt{font-size:30px;font-weight:800;color:var(--gold);margin:6px 0 2px;font-variant-numeric:tabular-nums}
+.ov .sub{opacity:.8;font-size:16px;margin:4px 0 20px}
+.ov .btn{margin-bottom:10px}
+.ov .btn.ghost{background:transparent;color:var(--white);border-color:rgba(255,255,255,.35)}
+.ov .rbig{font-size:72px;font-weight:900;letter-spacing:.06em;line-height:1;color:var(--gold);margin:6px 0 10px;font-variant-numeric:tabular-nums}
+.ov .spin{animation:pulse .18s linear infinite alternate}
+@keyframes pulse{from{opacity:.35}to{opacity:1}}
+.ov .skip{font-size:14px;opacity:.6;margin-top:18px}
+.ov .now{margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.15);font-size:16px}
 
+.camp{border-left:4px solid var(--gold);padding:10px 14px;margin:10px 0;background:#FBF8F1;border-radius:0 12px 12px 0}
+.camp b{display:block;font-size:17px}.camp small{color:var(--sub);font-size:14px}
+.news{padding:12px 0;border-bottom:1px solid #ECEEEA}.news:last-child{border-bottom:0}
+.news b{display:block;font-size:16px}.news p{margin:4px 0 0;font-size:15px;color:var(--sub);white-space:pre-wrap}
+.tk{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.tk:empty{display:none}
+.tk button{min-height:56px;border-radius:14px;border:1px solid rgba(198,166,107,.55);background:transparent;color:var(--white);font-size:16px;font-weight:700;cursor:pointer;text-align:left;padding:10px 16px}
+.tk button.on{background:var(--gold);color:var(--black);border-color:var(--gold)}
+.tk small{display:block;font-weight:600;opacity:.75;font-size:13px}
+.prize{font-size:13px;color:var(--gold-d);font-weight:700}
+.ov.r-N .rbig{color:#E8E8E4}
+.ov.r-R .rbig{color:#5AA9FF}
+.ov.r-SR .rbig{color:#B98CFF}
+.ov.r-SSR .rbig{color:var(--gold)}
+.ov.r-UR{background:radial-gradient(circle at 50% 35%,#2A2410 0%,rgba(16,25,24,.97) 60%)}
+.ov.r-UR .rbig{color:#F2D693;letter-spacing:.12em}
+.ov.r-LEGEND{background:radial-gradient(circle at 50% 35%,#3A2E10 0%,#101918 70%)}
+.ov.r-LEGEND .rbig{color:#F7DFA0;font-size:58px;letter-spacing:.14em;animation:rise .6s ease-out}
+.ov.r-PRIZE .rbig{color:var(--gold);font-size:56px}
+@keyframes rise{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.adm table td,.adm table th{font-size:14px;padding:8px 4px}
+.adm .chk{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.adm .chk label{margin:0;display:flex;align-items:center;gap:8px;min-height:48px;padding:8px 12px;border:2px solid var(--line);border-radius:12px;font-size:15px}
+.adm .chk label:has(input:checked){border-color:var(--green);background:var(--soft)}
+.adm .chk input{width:20px;height:20px;min-height:0}
+@media(prefers-reduced-motion:reduce){.ov.r-LEGEND .rbig{animation:none}}
+@media(max-width:360px){.members{grid-template-columns:1fr}.mcard{padding:18px}}
+@media(prefers-reduced-motion:reduce){.ov .spin{animation:none}}
+</style></head><body>
+<header><div><div class="brand">ZT PARTNER</div><div id="company">LINE認証を確認しています…</div></div></header>
+<main><div id="message" role="status" aria-live="polite"></div>
+<div id="app" hidden data-view="home">
+
+<!-- HOME -->
+<div class="view" id="v-home">
+ <div class="mcard" id="homeCard"></div>
+ <div class="stat"><div><span>保有ポイント</span><b id="hPoints">-</b></div><div><span id="hNextLbl">次のランクまで</span><b id="hNext">-</b><div class="bar-track"><div class="bar-fill" id="hBar" style="width:0"></div></div></div></div>
+ <button class="btn" type="button" onclick="go('report');tab('input')">日報を登録する</button>
+ <section><h3>現場ガチャ</h3><div class="ticket"><div class="st" id="hTicket">-</div><button class="small" type="button" onclick="go('gacha')">ガチャへ</button></div></section>
+ <section id="hCampSec" hidden><h3>開催中のキャンペーン</h3><div id="hCamps"></div></section>
+ <section id="hNewsSec" hidden><h3>お知らせ</h3><div id="hNews"></div></section>
+ <button class="btn ghost" type="button" onclick="go('report');tab('history')">日報履歴・月間集計を見る</button>
+</div>
+
+<!-- REPORT (2.0 features) -->
+<div class="view" id="v-report" data-tab="input">
+<div class="tabs"><button type="button" id="tabInput" class="on" onclick="tab('input')">日報入力</button><button type="button" id="tabHistory" onclick="tab('history')">履歴・集計</button></div>
 <section id="entry"><h2 id="heading">日報を登録</h2><form id="form">
 <label for="date">勤務開始日</label><input id="date" type="date" required>
 <label>氏名（複数選択）</label><div id="members" class="members"></div>
 <label for="site">現場名</label><input id="site" list="siteList" autocomplete="off" maxlength="100" required placeholder="現場名を入力（履歴から選択可）"><datalist id="siteList"></datalist>
-<div class="grid"><div><label for="units">1人あたりの人工</label><select id="units"></select></div><div><label for="shift">勤務区分</label><select id="shift" onchange="shiftChanged()"><option value="day">日勤</option><option value="night">夜勤</option></select><div class="seg"><button type="button" id="segDay" class="on" onclick="setShift('day')">☀ 日勤</button><button type="button" id="segNight" onclick="setShift('night')">☾ 夜勤</button></div></div></div>
+<div class="grid" style="grid-template-columns:1fr;gap:0"><div><label for="units">1人あたりの人工</label><select id="units"></select></div><div><label for="shift">勤務区分</label><select id="shift" onchange="shiftChanged()"><option value="day">日勤</option><option value="night">夜勤</option></select><div class="seg"><button type="button" id="segDay" class="on" onclick="setShift('day')">☀ 日勤</button><button type="button" id="segNight" onclick="setShift('night')">☾ 夜勤</button></div></div></div>
 <p class="note">選択した全員に同じ人工を適用します。人工が異なる場合は別の日報に分けて登録してください。</p>
 <div class="grid"><div><label for="start">始業（24時間）</label><select id="start"></select></div><div><label for="end">終業（24時間）</label><select id="end"></select></div></div>
 <label for="endDayOffset">終業日</label><select id="endDayOffset"><option value="0">勤務開始日と同日</option><option value="1">勤務開始日の翌日（夜勤）</option></select>
 <div id="reasonBox" hidden><label for="reason">修正理由</label><input id="reason" maxlength="200"></div>
-<button type="button" class="secondary reset" onclick="newReport()">入力をリセット</button><div class="bar"><p id="estimate" class="badge"></p><button id="save" type="submit">日報を登録する</button></div>
-</form></section><section id="historySec"><h2>月間集計・日報履歴</h2><label for="month">対象月（勤務開始日基準）</label><input id="month" type="month" onchange="load()"><p id="totals" class="badge"></p><div id="history"></div></section></div></main><div id="done" hidden><div class="ck">✓</div><div id="doneText">日報を登録しました</div><small>LINE通知は別処理で送信します</small></div>
+<button type="button" class="reset" onclick="newReport()">入力をリセット</button>
+<div class="savebar"><p id="estimate" class="badge"></p><button id="save" class="btn" type="submit">日報を登録する</button></div>
+</form></section>
+<section id="historySec"><h2>月間集計・日報履歴</h2><label for="month">対象月（勤務開始日基準）</label><input id="month" type="month" onchange="load()"><p id="totals" class="badge"></p><div id="history"></div></section>
+</div>
+
+<!-- GACHA -->
+<div class="view" id="v-gacha">
+ <div class="gacha-hero"><div class="lbl">GENBA GACHA</div><div class="big" id="gTitle">現場ガチャ</div><div class="note" id="gNote"></div><div class="tk" id="gTickets"></div><button class="btn gold" type="button" id="gBtn" onclick="startDraw()">ガチャを回す</button></div>
+ <section><h3 id="gTableTitle">排出率</h3><table><thead><tr><th>レア度</th><th class="r">確率</th><th class="r">獲得</th></tr></thead><tbody id="gTable"></tbody></table><p class="note">日報を登録すると、その勤務開始日のガチャを1回引けます（無料・1社1日1回）。表示の確率は実際の抽選と同じです。</p></section>
+ <section><h3>ガチャ履歴</h3><ul class="hist" id="gHist"></ul></section>
+</div>
+
+<!-- CARD -->
+<div class="view" id="v-card">
+ <div class="mcard" id="cardCard"></div>
+ <section><dl id="cardInfo"></dl><p class="note">会員ランクはアプリの利用実績（日報登録）を示すもので、施工能力や安全評価を示すものではありません。</p></section>
+</div>
+
+<!-- MY PAGE -->
+<div class="view" id="v-mypage">
+ <button class="btn gold" type="button" id="adminEntry" hidden onclick="openAdmin()">ZT管理者メニュー</button>
+ <section><h3>会社情報</h3><dl id="myCompany"></dl></section>
+ <section><h3>利用情報</h3><dl id="myUsage"></dl></section>
+ <section><h3>ポイント履歴</h3><ul class="hist" id="myHist"></ul></section>
+ <section><h3>キャンペーン履歴</h3><ul class="hist" id="myCamp"></ul></section>
+ <button class="btn ghost" type="button" onclick="load()">最新の情報に更新</button>
+ <button class="btn ghost" type="button" onclick="logout()">ログアウト</button>
+ <p class="note" style="text-align:center">ZT日報DX 3.0</p>
+</div>
+
+<!-- ZT ADMIN: the server checks the admin LINE ID on every call; hiding this view is not the protection -->
+<div class="view adm" id="v-admin">
+ <h2>ZT管理者メニュー</h2>
+ <p class="note">確率・ランク・キャンペーン・景品・お知らせの設定は、管理用スプレッドシートで編集します。</p>
+ <section><h3>全社のポイント</h3><table><thead><tr><th>会社</th><th class="r">保有</th><th class="r">累計</th><th>ランク</th></tr></thead><tbody id="aCompanies"></tbody></table></section>
+ <section><h3>ポイント操作</h3>
+  <label>対象会社</label><div class="chk" id="aTargets"></div>
+  <label for="aOp">操作</label><select id="aOp" onchange="$('aPtBox').hidden=this.value==='reset'"><option value="add">加算（プレゼント）</option><option value="sub">減算</option><option value="set">残高修正（指定した残高にする）</option><option value="reset">リセット（残高を0にする）</option></select>
+  <div id="aPtBox"><label for="aPt">ポイント</label><input id="aPt" type="number" inputmode="numeric" min="0" step="1"></div>
+  <label for="aReason">理由</label><input id="aReason" maxlength="200" placeholder="例：パートナー会特別プレゼント">
+  <button class="btn" type="button" style="margin-top:18px" onclick="confirmAdmin()">内容を確認する</button>
+ </section>
+ <section><h3>キャンペーン</h3><ul class="hist" id="aCamps"></ul></section>
+ <section><h3>景品の引渡し待ち</h3><ul class="hist" id="aWins"></ul><p class="note">引渡し状況は「景品当選」シートで更新します。</p></section>
+ <section><h3>最近の操作履歴</h3><ul class="hist" id="aLog"></ul></section>
+ <button class="btn ghost" type="button" onclick="openAdmin()">再読込</button>
+ <button class="btn ghost" type="button" id="aBack" onclick="go('mypage')">戻る</button>
+</div>
+</div></main>
+
+<nav class="bottom" id="nav" hidden>
+ <button type="button" data-v="home" class="on" onclick="go('home')"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>ホーム</button>
+ <button type="button" data-v="report" onclick="go('report')"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>日報</button>
+ <button type="button" data-v="gacha" onclick="go('gacha')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4a12 12 0 0 1 0 16"/></svg>ガチャ<span class="pip" id="navPip" hidden></span></button>
+ <button type="button" data-v="card" onclick="go('card')"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M7 15h4"/></svg>会員証</button>
+ <button type="button" data-v="mypage" onclick="go('mypage')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>マイページ</button>
+</nav>
+
+<!-- after save -->
+<div class="ov" id="ovSaved" hidden><div class="box"><div class="ck">✓</div><div class="t1" id="svTitle">日報を登録しました</div><div class="pt" id="svPt"></div><div class="sub" id="svSub"></div><div id="svBtns"></div></div></div>
+<div class="ov" id="ovAdmin" hidden><div class="box"><div class="t1">この内容で反映しますか？</div><div class="sub" id="acText" style="white-space:pre-wrap;text-align:left"></div><div id="acBtns"></div></div></div>
+<!-- gacha draw / result -->
+<div class="ov" id="ovGacha" hidden onclick="skipAnim()"><div class="box"><div class="lbl" style="font-size:12px;letter-spacing:.3em;color:var(--gold);font-weight:700">GENBA GACHA</div><div class="rbig" id="grRar">?</div><div class="t1" id="grTitle"></div><div class="pt" id="grPt"></div><div class="sub" id="grSub"></div><div id="grBtns"></div><div class="now" id="grNow"></div><div class="skip" id="grSkip">タップでスキップ</div></div></div>
+
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script src="config.js"></script>
 <script>
@@ -101,7 +268,15 @@ async function rpc(action,...args){
 function today(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Tokyo'}).format(new Date());}
 function token(){const t=liff.getIDToken(),d=liff.getDecodedIDToken();if(!t||!d||d.exp*1000<Date.now()+60000){relogin();throw Error('再ログインしています…');}return t;}
 function option(value,text){const o=document.createElement('option');o.value=value;o.textContent=text;return o;}
-async function load(){if(busy)return;busy=true;$('save').disabled=true;try{state=await rpc('bootstrap',$('month').value);$('company').textContent=state.companyName+'｜代表者専用';$('app').hidden=false;render();newReport();msg('履歴を読み込みました。');}catch(e){msg(e.message,true);}finally{busy=false;$('save').disabled=false;}}
+function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
+const fmt=n=>Number(n||0).toLocaleString('ja-JP');
+const md=d=>{const [y,m,dd]=d.split('-');return Number(m)+'月'+Number(dd)+'日';};
+let me=null;
+async function load(){if(busy)return;busy=true;$('save').disabled=true;try{
+ if(!me)me=await rpc('session');
+ $('adminEntry').hidden=!me.isAdmin;
+ if(!me.isPartner){if(!me.isAdmin)throw Error('代表者として未登録です。管理者にお問い合わせください。');$('company').textContent='ZT管理者';$('app').hidden=false;$('aBack').hidden=true;busy=false;await openAdmin();return;}
+ state=await rpc('bootstrap',$('month').value);$('company').textContent=state.companyName;$('app').hidden=false;$('nav').hidden=false;render();newReport();msg('');}catch(e){msg(e.message,true);}finally{busy=false;$('save').disabled=false;}}
 function loadSites(){try{return JSON.parse(localStorage.getItem('ztSites')||'[]');}catch(e){return [];}}
 function saveSite(v){v=(v||'').trim();if(!v)return;const a=[v,...loadSites().filter(x=>x!==v)].slice(0,50);try{localStorage.setItem('ztSites',JSON.stringify(a));}catch(e){}renderSites();}
 function renderSites(){const a=[...loadSites(),...((state&&state.reports)||[]).map(e=>e.after.site)].filter(Boolean);$('siteList').replaceChildren(...[...new Set(a)].map(v=>{const o=document.createElement('option');o.value=v;return o;}));}
@@ -112,23 +287,159 @@ function render(){
  $('units').replaceChildren(...state.unitChoices.map(v=>option(v,v+'人工')));
  const s=state.summary;$('totals').textContent=s.units+'人工 ／ '+(s.unpriced?'金額未確定（単価未設定 '+s.unpriced+'件・設定済分 '+s.knownAmount.toLocaleString()+'円）':s.knownAmount.toLocaleString()+'円');
  $('history').replaceChildren();if(!state.reports.length)$('history').textContent='この月の日報はありません。';
- state.reports.sort((a,b)=>b.after.date.localeCompare(a.after.date)).forEach(e=>{const d=document.createElement('div');d.className='row';const p=document.createElement('p');const r=e.after;p.textContent=r.date+'｜'+r.site+'｜'+(r.shift==='night'?'夜勤':'日勤')+'｜'+r.totalUnits+'人工';const names=document.createElement('p');names.className='note';names.textContent=r.members.map(m=>m.name).join('・')+' ／ '+r.start+'〜'+(r.endDayOffset?'翌日 ':'')+r.end;const status=document.createElement('p');status.className='note';status.textContent='通知：'+e.notificationStatus;const b=document.createElement('button');b.className='secondary';b.textContent='編集';b.onclick=()=>edit(e);const audit=document.createElement('details'),sum=document.createElement('summary');sum.textContent='修正履歴（'+e.revision+'版）';audit.append(sum);state.revisions.filter(x=>x.id===e.id).forEach(x=>{const pre=document.createElement('pre');pre.textContent=JSON.stringify({版:x.revision,日時:x.at,操作代表者:x.actor,理由:x.reason,修正前:x.before,修正後:x.after},null,2);audit.append(pre);});d.append(p,names,status,b,audit);$('history').append(d);});
+ state.reports.sort((a,b)=>b.after.date.localeCompare(a.after.date)).forEach(e=>{const d=document.createElement('div');d.className='row';const p=document.createElement('p');const r=e.after;p.textContent=r.date+'｜'+r.site+'｜'+(r.shift==='night'?'夜勤':'日勤')+'｜'+r.totalUnits+'人工';const names=document.createElement('p');names.className='note';names.textContent=r.members.map(m=>m.name).join('・')+' ／ '+r.start+'〜'+(r.endDayOffset?'翌日 ':'')+r.end;const status=document.createElement('p');status.className='note';status.textContent='通知：'+e.notificationStatus;const b=document.createElement('button');b.className='small';b.type='button';b.textContent='編集';b.onclick=()=>edit(e);const audit=document.createElement('details'),sum=document.createElement('summary');sum.textContent='修正履歴（'+e.revision+'版）';audit.append(sum);state.revisions.filter(x=>x.id===e.id).forEach(x=>{const pre=document.createElement('pre');pre.textContent=JSON.stringify({版:x.revision,日時:x.at,操作代表者:x.actor,理由:x.reason,修正前:x.before,修正後:x.after},null,2);audit.append(pre);});d.append(p,names,status,b,audit);$('history').append(d);});
+ renderMember();
 }
+// ===== 3.0 views =====
+function go(v){if(!$('message').classList.contains('error'))msg('');$('app').dataset.view=v;document.querySelectorAll('nav.bottom button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));window.scrollTo(0,0);}
+const KIND={report:'日報登録',gacha:'ガチャ',campaign:'キャンペーン',admin:'ZTより',reset:'リセット',expire:'有効期限切れ',ticket:'抽選権'};
+function sign(n){return (n>0?'+':'')+fmt(n)+'pt';}
+function dlist(id,rows){$(id).replaceChildren(...rows.flatMap(([k,v])=>[el('dt',null,k),el('dd',null,v)]));}
+function hlist(id,items,empty){$(id).replaceChildren(...(items.length?items:[el('li','muted',empty)]));}
+function hItem(left,right){const li=el('li');li.append(el('span',null,left),el('b',null,right));return li;}
+function hLabel(h){return (h.date?md(h.date)+'　':'')+(h.kind==='gacha'?(h.label||'ガチャ')+(h.prizeName?'（'+h.prizeName+'）':''):(h.label||KIND[h.kind]||h.kind));}
+function period(c){const f=t=>new Date(t).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});return f(c.start)+'〜'+f(c.end);}
+function cardHTML(target){
+ const m=state.member||{};const c=$(target);c.replaceChildren();
+ const top=el('div','top');const l=el('div');l.append(el('div','lbl','ZT PARTNER MEMBERSHIP'));top.append(l,el('span','rank',m.rank||'-'));
+ const name=el('div','name',m.companyName||state.companyName);
+ const bottom=el('div','bottom');const left=el('div');left.append(el('div','k','MEMBER NO.'),el('div','v',m.memberNo||'未設定'),el('div','k','SINCE  '+(m.joinedAt||'未設定')));
+ const right=el('div','pts');const pv=el('div','v',fmt(m.points));pv.append(el('small',null,'pt'));right.append(el('div','k','POINTS'),pv);bottom.append(left,right);
+ c.append(top,name,bottom);
+}
+let selTicket=null;
+function renderMember(){
+ const m=state.member;if(!m)return;
+ cardHTML('homeCard');cardHTML('cardCard');
+ $('hPoints').textContent=fmt(m.points)+'pt';
+ if(m.nextRank){$('hNextLbl').textContent=m.nextRank+'まで';$('hNext').textContent=fmt(m.toNext)+'pt';$('hBar').style.width=Math.max(4,Math.min(100,Math.round(m.rankPt/(m.rankPt+m.toNext)*100)))+'%';}
+ else{$('hNextLbl').textContent='ランク';$('hNext').textContent='最上位';$('hBar').style.width='100%';}
+ const t=m.tickets||[];$('navPip').hidden=!t.length;
+ const drewToday=(m.history||[]).some(h=>h.kind==='gacha'&&h.date===today());
+ $('hTicket').replaceChildren(el('span','dot'+(t.length?'':' off')),document.createTextNode(t.length?'引けるガチャが '+t.length+'回 あります':drewToday?'今日の抽選は終了しました':'日報を登録すると引けます'));
+ // campaigns & news
+ $('hCampSec').hidden=!(m.campaigns||[]).length;
+ $('hCamps').replaceChildren(...(m.campaigns||[]).map(c=>{const d=el('div','camp');d.append(el('b',null,c.name),el('small',null,period(c)));if(c.desc)d.append(el('div','note',c.desc));return d;}));
+ $('hNewsSec').hidden=!(m.news||[]).length;
+ $('hNews').replaceChildren(...(m.news||[]).map(n=>{const d=el('div','news');d.append(el('b',null,(n.date?n.date+'　':'')+n.title),el('p',null,n.body));return d;}));
+ // gacha view
+ if(!t.some(x=>x.ticketId===selTicket))selTicket=t.length?t[t.length-1].ticketId:null;
+ const cur=t.find(x=>x.ticketId===selTicket);
+ $('gTickets').replaceChildren(...(t.length>1?t.map(x=>{const b=el('button',x.ticketId===selTicket?'on':'',x.label||'ガチャ');b.type='button';b.append(el('small',null,(x.date?md(x.date)+'分':'')+(x.expires?'　期限 '+new Date(x.expires).toLocaleDateString('ja-JP',{timeZone:'Asia/Tokyo'}):'')));b.onclick=()=>{selTicket=x.ticketId;renderMember();};return b;}):[]));
+ $('gTitle').textContent=cur?(cur.label||'現場ガチャ'):drewToday?'今日の抽選は終了しました':'まだガチャ権利がありません';
+ $('gNote').textContent=cur?(t.length>1?'引くガチャを選んでください':(cur.date?md(cur.date)+'の日報分':'')):drewToday?'明日も日報を登録するとガチャを引けます':'日報を登録すると、ガチャを1回引けます';
+ $('gBtn').hidden=!cur;
+ const tb=(m.tables||{})[cur?cur.gachaId:'normal']||{rows:[]};
+ $('gTableTitle').textContent='排出率（'+(tb.name||'通常ガチャ')+'）';
+ $('gTable').replaceChildren(...(tb.rows.length?tb.rows.map(g=>{const tr=el('tr');const td=el('td','rar',g.rarity);if(g.prizeName)td.append(el('div','prize',g.prizeName));tr.append(td,el('td','r',(Math.round(g.rate*1000)/1000)+'%'),el('td','r',g.prizeName?'景品':fmt(g.pt)+'pt'));return tr;}):[(()=>{const tr=el('tr');const td=el('td','muted',tb.error||'-');td.colSpan=3;tr.append(td);return tr;})()]));
+ hlist('gHist',(m.history||[]).filter(h=>h.kind==='gacha').map(h=>hItem(hLabel(h),h.prizeName?'景品':sign(h.pt))),'まだ履歴はありません');
+ // card + mypage
+ dlist('cardInfo',[['会社名',m.companyName||state.companyName],['会員番号',m.memberNo||'未設定'],['加入年月',m.joinedAt||'未設定'],['ランク',m.rank],['保有ポイント',fmt(m.points)+'pt'],['累計獲得ポイント',fmt(m.cumulative)+'pt']]);
+ dlist('myCompany',[['会社名',state.companyName],['登録作業員',state.members.map(x=>x.name).join('・')||'なし'],['人工の選択肢',state.unitChoices.join(' / ')]]);
+ dlist('myUsage',[['今月の人工（表示中の月）',state.summary.units+'人工'],['今月の日報件数',state.reports.length+'件'],['日報登録ポイント','1日1回 '+m.reportPoints+'pt'],['ポイント対象','当日・前日分'],['現在のランク',m.rank],['次のランクまで',m.nextRank?fmt(m.toNext)+'pt':'最上位']]);
+ hlist('myHist',(m.history||[]).filter(h=>h.pt).map(h=>hItem(hLabel(h),sign(h.pt))),'まだ履歴はありません');
+ hlist('myCamp',(m.history||[]).filter(h=>h.campaignId).map(h=>hItem(hLabel(h),h.prizeName?'景品':sign(h.pt))),'まだ参加履歴はありません');
+}
+let drawing=false,animTimer=null,animDone=null;
+function drawKey(t){return 'ztDraw:'+t;}
+function drawId(t){let id=null;try{id=localStorage.getItem(drawKey(t));}catch(e){}if(!id){id=crypto.randomUUID();try{localStorage.setItem(drawKey(t),id);}catch(e){}}return id;}
+async function startDraw(ticketId){
+ ticketId=ticketId||selTicket;if(!ticketId||drawing)return;drawing=true;$('gBtn').disabled=true;$('ovSaved').hidden=true;
+ // Same requestId for the same ticket: a retry after a network error returns the stored result.
+ const req=drawId(ticketId);
+ $('ovGacha').className='ov';$('grRar').textContent='?';$('grRar').classList.add('spin');['grTitle','grPt','grSub','grNow'].forEach(k=>$(k).textContent='');$('grBtns').replaceChildren();$('grSkip').hidden=false;$('ovGacha').hidden=false;
+ const tk=(state.member.tickets||[]).find(x=>x.ticketId===ticketId),tb=(state.member.tables||{})[tk?tk.gachaId:'normal']||{rows:[]};
+ const rars=tb.rows.map(g=>g.rarity);let i=0;animTimer=setInterval(()=>{$('grRar').textContent=rars[i++%rars.length]||'?';},90);
+ const minWait=new Promise(r=>{animDone=r;setTimeout(r,1400);});
+ try{
+  const [res]=await Promise.all([rpc('drawGacha',{ticketId,requestId:req}),minWait]);
+  showResult(res);
+  try{localStorage.removeItem(drawKey(ticketId));}catch(e){}
+  load();
+ }catch(e){stopAnim();$('grRar').textContent='!';$('grTitle').textContent='抽選できませんでした';$('grSub').textContent=e.message+'（権利は残っています）';$('grBtns').replaceChildren(btn('もう一度試す','gold',()=>{drawing=false;startDraw(ticketId);}),btn('閉じる','ghost',closeGacha));}
+ finally{drawing=false;$('gBtn').disabled=false;}
+}
+function stopAnim(){clearInterval(animTimer);$('grRar').classList.remove('spin');$('grSkip').hidden=true;}
+function skipAnim(){if(animDone)animDone();}
+function showResult(r){
+ stopAnim();
+ const cls=r.prizeName?'PRIZE':(['N','R','SR','SSR','UR','LEGEND'].includes(r.rarity)?r.rarity:'N');
+ $('ovGacha').className='ov r-'+cls;
+ $('grRar').textContent=r.rarity;
+ if(r.prizeName){$('grTitle').textContent=r.prizeName+' 当選！';$('grPt').textContent='';$('grSub').textContent='景品はZTから後日お届けします';}
+ else{
+  $('grTitle').textContent=r.rarity==='LEGEND'?'伝説級の大当たり！':r.rarity==='UR'?'UR 超大当たり！':r.rarity==='SSR'?'SSR 大当たり！':r.rarity+' 当たり！';
+  $('grPt').textContent='+'+fmt(r.pt)+'pt獲得';
+  $('grSub').textContent=r.already?'このガチャは抽選済みです':'今日もお疲れさまでした！';
+ }
+ $('grNow').textContent='現在のポイント：'+fmt(r.points)+'pt';
+ $('grBtns').replaceChildren(btn('閉じる','ghost',closeGacha));
+}
+function closeGacha(e){if(e)e.stopPropagation();$('ovGacha').hidden=true;go('home');}
+function btn(text,cls,fn){const b=el('button','btn '+(cls||''),text);b.type='button';b.onclick=e=>{e.stopPropagation();fn(e);};return b;}
+function showSaved(wasEdit,result){
+ $('svPt').textContent='';$('svSub').textContent='';$('svBtns').replaceChildren();
+ if(wasEdit){$('svTitle').textContent='日報の修正が完了しました';$('svBtns').append(btn('閉じる','ghost',()=>{$('ovSaved').hidden=true;}));}
+ else{
+  $('svTitle').textContent='日報を登録しました';
+  const rw=result&&result.reward;
+  if(rw){$('svPt').textContent='+'+fmt(rw.pt)+'pt 獲得';$('svSub').textContent=(rw.campaign?rw.campaign+' 適用中　':'')+'今日の現場ガチャ';$('svBtns').append(btn('ガチャを回す','gold',()=>startDraw(rw.ticketId)),btn('あとで引く','ghost',()=>{$('ovSaved').hidden=true;}));}
+  else{$('svSub').textContent='この日の分のポイントは付与済み、または対象外です';$('svBtns').append(btn('閉じる','ghost',()=>{$('ovSaved').hidden=true;}));}
+ }
+ $('ovSaved').hidden=false;
+}
+// ===== ZT admin =====
+let adm=null,admPending=null;
+async function openAdmin(){
+ go('admin');
+ try{adm=await rpc('adminOverview');}catch(e){msg(e.message,true);return;}
+ $('aCompanies').replaceChildren(...adm.companies.map(c=>{const tr=el('tr');tr.append(el('td',null,c.name+(c.error?'（'+c.error+'）':'')),el('td','r',c.error?'-':fmt(c.points)),el('td','r',c.error?'-':fmt(c.cumulative)),el('td',null,c.rank||'-'));return tr;}));
+ const chk=adm.companies.filter(c=>!c.error).map(c=>{const l=el('label');const i=el('input');i.type='checkbox';i.value=c.id;l.append(i,document.createTextNode(c.name));return l;});
+ const all=el('label');const ai=el('input');ai.type='checkbox';ai.value='ALL';ai.onchange=()=>$('aTargets').querySelectorAll('input:not([value=ALL])').forEach(x=>{x.checked=false;x.disabled=ai.checked;});all.append(ai,document.createTextNode('全社'));
+ $('aTargets').replaceChildren(all,...chk);
+ hlist('aCamps',adm.campaigns.map(c=>hItem(c.name+'（'+c.type+'）',(c.running?'開催中':c.status)+(c.prize&&!c.legal?'・法令確認待ち':'')+(c.budgetPt?'・'+fmt(c.usedPt)+'/'+fmt(c.budgetPt)+'pt':''))),'キャンペーンはありません');
+ hlist('aWins',adm.wins.map(w=>hItem(w.at+'　'+w.company+'　'+w.prize,w.status)),'引渡し待ちはありません');
+ hlist('aLog',adm.log.map(l=>hItem(new Date(l.at).toLocaleDateString('ja-JP',{timeZone:'Asia/Tokyo'})+'　'+l.company+'　'+l.op+'（'+l.reason+'）',sign(Number(l.delta)))),'まだ操作はありません');
+}
+function confirmAdmin(){
+ const all=$('aTargets').querySelector('input[value=ALL]').checked;
+ const ids=[...$('aTargets').querySelectorAll('input:checked')].map(i=>i.value).filter(v=>v!=='ALL');
+ const op=$('aOp').value,pt=op==='reset'?0:Number($('aPt').value),reason=$('aReason').value.trim();
+ if(!all&&!ids.length)return msg('対象会社を選択してください',true);
+ if(op!=='reset'&&(!Number.isInteger(pt)||pt<0||(op!=='set'&&pt===0)))return msg('ポイントを正しく入力してください',true);
+ if(!reason)return msg('理由を入力してください',true);
+ msg('');
+ const names=all?'全社':adm.companies.filter(c=>ids.includes(c.id)).map(c=>c.name).join('、');
+ const opName={add:'加算',sub:'減算',set:'残高修正',reset:'リセット'}[op];
+ // One requestId per confirmed operation: resending after a network error does not apply it twice.
+ const next={targets:all?'ALL':ids,op,pt,reason};
+ const same=admPending&&JSON.stringify(Object.assign({},admPending,{requestId:0}))===JSON.stringify(Object.assign({},next,{requestId:0}));
+ admPending=Object.assign(next,{requestId:same?admPending.requestId:crypto.randomUUID()});
+ $('acText').textContent='対象：'+names+'\n操作：'+opName+(op==='reset'?'（残高を0にします）':op==='set'?'（残高を '+fmt(pt)+'pt にします）':'　'+fmt(pt)+'pt')+'\n理由：'+reason;
+ $('acBtns').replaceChildren(btn('反映する','gold',runAdmin),btn('やめる','ghost',()=>{$('ovAdmin').hidden=true;}));
+ $('ovAdmin').hidden=false;
+}
+async function runAdmin(){
+ if(!admPending||busy)return;busy=true;
+ try{const r=await rpc('adminPoints',admPending);admPending=null;$('ovAdmin').hidden=true;$('aPt').value='';$('aReason').value='';const done='反映しました：'+r.results.map(x=>x.name+' '+sign(x.delta)+'（残高 '+fmt(x.after)+'pt）').join('、');busy=false;await openAdmin();msg(done);}
+ catch(e){$('ovAdmin').hidden=true;msg(e.message+'（同じ内容で「内容を確認する」から再送しても二重には反映されません）',true);}
+ finally{busy=false;}
+}
+// ===== 2.0 form logic (unchanged behavior) =====
 function newReport(){editing=null;pending=null;$('form').reset();$('date').value=today();$('units').value=state?.unitChoices.includes(1)?1:state?.unitChoices[0];$('start').value='08:00';$('end').value='17:00';$('heading').textContent='日報を登録';$('save').textContent='日報を登録する';$('reasonBox').hidden=true;$('reason').required=false;shiftChanged();estimate();}
-function tab(t){$('app').dataset.tab=t;$('tabInput').classList.toggle('on',t==='input');$('tabHistory').classList.toggle('on',t==='history');window.scrollTo(0,0);}
+function tab(t){$('v-report').dataset.tab=t;$('tabInput').classList.toggle('on',t==='input');$('tabHistory').classList.toggle('on',t==='history');window.scrollTo(0,0);}
 function setShift(v){$('shift').value=v;if(!editing){if(v==='night'){$('start').value='20:00';$('end').value='05:00';$('endDayOffset').value='1';}else{$('start').value='08:00';$('end').value='17:00';}}shiftChanged();}
 function shiftChanged(){const night=$('shift').value==='night';$('segDay').classList.toggle('on',!night);$('segNight').classList.toggle('on',night);$('endDayOffset').options[1].disabled=!night;if(!night)$('endDayOffset').value='0';estimate();}
-function edit(e){newReport();editing=e;const r=e.after;['start','end'].forEach(k=>{if(r[k]&&![...$(k).options].some(o=>o.value===r[k]))$(k).append(option(r[k],r[k]));});['date','site','shift','units','start','end','endDayOffset'].forEach(k=>$(k).value=r[k]);const ids=r.members.map(m=>m.id);$('members').querySelectorAll('input').forEach(i=>i.checked=ids.includes(i.value));$('heading').textContent='日報を修正（第'+e.revision+'版）';$('save').textContent='修正を保存';$('reasonBox').hidden=false;$('reason').required=true;shiftChanged();estimate();tab('input');if(ids.some(id=>!state.members.some(m=>m.id===id)))msg('退会済みの氏名があります。現在の登録氏名で選び直してください。',true);}
+function edit(e){newReport();editing=e;const r=e.after;['start','end'].forEach(k=>{if(r[k]&&![...$(k).options].some(o=>o.value===r[k]))$(k).append(option(r[k],r[k]));});['date','site','shift','units','start','end','endDayOffset'].forEach(k=>$(k).value=r[k]);const ids=r.members.map(m=>m.id);$('members').querySelectorAll('input').forEach(i=>i.checked=ids.includes(i.value));$('heading').textContent='日報を修正（第'+e.revision+'版）';$('save').textContent='修正を保存';$('reasonBox').hidden=false;$('reason').required=true;shiftChanged();estimate();go('report');tab('input');if(ids.some(id=>!state.members.some(m=>m.id===id)))msg('退会済みの氏名があります。現在の登録氏名で選び直してください。',true);}
 function estimate(){const count=$('members').querySelectorAll(':checked').length;$('estimate').textContent='合計 '+Math.round(count*Number($('units').value)*100)/100+'人工（'+count+'名）';}
 $('units').onchange=estimate;
 $('form').onsubmit=async ev=>{ev.preventDefault();if(busy)return;busy=true;$('save').disabled=true;
  try{const p={};['date','site','shift','units','start','end','endDayOffset','reason'].forEach(k=>p[k]=$(k).value);saveSite(p.site);p.memberIds=[...$('members').querySelectorAll(':checked')].map(i=>i.value);if(editing){p.id=editing.id;p.revision=editing.revision;}
  const fingerprint=JSON.stringify(p);if(pending&&pending.fingerprint!==fingerprint)throw Error('前の送信結果を確認できていません。入力を元に戻して再送するか、履歴を再読込して確認してください。');if(!pending)pending={fingerprint,id:crypto.randomUUID()};p.requestId=pending.id;
- const wasEdit=!!editing;const result=await rpc('saveReport',p);pending=null;$('doneText').textContent=wasEdit?'日報を修正しました':'日報を登録しました';$('done').hidden=false;setTimeout(()=>$('done').hidden=true,1800);msg('保存しました。'+(result.notification||''));busy=false;await load();msg('保存しました。LINE通知は別処理で送信します。');
+ const wasEdit=!!editing;const result=await rpc('saveReport',p);pending=null;showSaved(wasEdit,result);busy=false;await load();msg('保存しました。LINE通知は別処理で送信します。');
  }catch(e){msg(e.message,true);}finally{busy=false;$('save').disabled=false;}};
-function logout(){liff.logout();$('app').hidden=true;state=null;msg('ログアウトしました。LINEから開き直してください。');}
+function logout(){liff.logout();$('app').hidden=true;$('nav').hidden=true;state=null;msg('ログアウトしました。LINEから開き直してください。');}
 for(let h=0;h<24;h++)for(let m=0;m<60;m+=30){const t=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');$('start').append(option(t,t));$('end').append(option(t,t));}
 $('month').value=today().slice(0,7);
 (async()=>{try{if(!LIFF_ID||!API_URL)throw Error('LIFF IDまたはAPI URLが未設定です。管理者にご確認ください。');await liff.init({liffId:LIFF_ID});if(!liff.isLoggedIn()){liff.login();return;}await load();}catch(e){msg(e.message,true);}})();
 </script></body></html>
-
