@@ -35,7 +35,7 @@ async function rpc(action,...args){
 function today(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Tokyo'}).format(new Date());}
 function token(){const t=liff.getIDToken(),d=liff.getDecodedIDToken();if(!t||!d||d.exp*1000<Date.now()+60000){relogin();throw Error('再ログインしています…');}return t;}
 function option(value,text){const o=document.createElement('option');o.value=value;o.textContent=text;return o;}
-async function load(){if(busy)return;busy=true;$('save').disabled=true;try{state=await rpc('bootstrap',token(),$('month').value);$('company').textContent=state.companyName+'｜代表者専用';$('app').hidden=false;render();newReport();msg('履歴を読み込みました。');}catch(e){msg(e.message,true);}finally{busy=false;$('save').disabled=false;}}
+async function load(){if(busy)return;busy=true;$('save').disabled=true;try{state=await rpc('bootstrap',$('month').value);$('company').textContent=state.companyName+'｜代表者専用';$('app').hidden=false;render();newReport();msg('履歴を読み込みました。');}catch(e){msg(e.message,true);}finally{busy=false;$('save').disabled=false;}}
 function render(){
  const selected=[...$('members').querySelectorAll(':checked')].map(x=>x.value);$('members').replaceChildren();
  state.members.forEach(m=>{const label=document.createElement('label'),i=document.createElement('input');i.type='checkbox';i.value=m.id;i.checked=selected.includes(m.id);i.onchange=estimate;label.append(i,document.createTextNode(' '+m.name));$('members').append(label);});
@@ -52,7 +52,7 @@ $('units').onchange=estimate;
 $('form').onsubmit=async ev=>{ev.preventDefault();if(busy)return;busy=true;$('save').disabled=true;
  try{const p={};['date','site','shift','units','start','end','endDayOffset','reason'].forEach(k=>p[k]=$(k).value);p.memberIds=[...$('members').querySelectorAll(':checked')].map(i=>i.value);if(editing){p.id=editing.id;p.revision=editing.revision;}
  const fingerprint=JSON.stringify(p);if(pending&&pending.fingerprint!==fingerprint)throw Error('前の送信結果を確認できていません。入力を元に戻して再送するか、履歴を再読込して確認してください。');if(!pending)pending={fingerprint,id:crypto.randomUUID()};p.requestId=pending.id;
- const result=await rpc('saveReport',token(),p);pending=null;msg('保存しました。'+(result.notification||''));busy=false;await load();msg('保存しました。LINE通知は別処理で送信します。');
+ const result=await rpc('saveReport',p);pending=null;msg('保存しました。'+(result.notification||''));busy=false;await load();msg('保存しました。LINE通知は別処理で送信します。');
  }catch(e){msg(e.message,true);}finally{busy=false;$('save').disabled=false;}};
 function logout(){liff.logout();$('app').hidden=true;state=null;msg('ログアウトしました。LINEから開き直してください。');}
 for(let h=0;h<24;h++)for(let m=0;m<60;m++){const t=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');$('start').append(option(t,t));$('end').append(option(t,t));}
